@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
 import subscriptionRoutes from '@/routes/subscriptionRoutes';
+import { unsubscribeController } from '@/controllers/unsubscribeController';
 import { apiKeyMiddleware } from '@/middlewares/apiKeyMiddleware';
 import { errorMiddleware } from '@/middlewares/errorMiddleware';
 import { logger } from '@/config/logger';
@@ -26,6 +27,8 @@ app.get('/metrics', async (_req, res) => {
   res.setHeader('Content-Type', metricsRegistry.contentType);
   res.send(await metricsRegistry.metrics());
 });
+
+app.get('/unsubscribe/:token', unsubscribeController.get);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.use('/api', apiKeyMiddleware, subscriptionRoutes);

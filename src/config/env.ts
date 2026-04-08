@@ -29,6 +29,10 @@ export const env = {
   smtpUser: process.env.SMTP_USER || '',
   smtpPass: process.env.SMTP_PASS || '',
   smtpFrom: process.env.SMTP_FROM || 'noreply@example.com',
+  /** Public base URL for email links (unsubscribe). Falls back to http://localhost:{PORT}. */
+  publicAppUrl:
+    (process.env.PUBLIC_APP_URL && process.env.PUBLIC_APP_URL.replace(/\/$/, '')) ||
+    `http://localhost:${parseNumber(process.env.PORT, 3000)}`,
   apiKey: process.env.API_KEY,
   enableRedisCache: parseBool(process.env.ENABLE_REDIS_CACHE, false),
   redisUrl: process.env.REDIS_URL || 'redis://redis:6379',

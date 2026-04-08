@@ -22,4 +22,23 @@ export const subscriptionRepository = {
       data: { lastSeenTag: tag },
     });
   },
+
+  updateUnsubscribeToken(id: string, unsubscribeToken: string): Promise<Subscription> {
+    return prisma.subscription.update({
+      where: { id },
+      data: { unsubscribeToken },
+    });
+  },
+
+  findByUnsubscribeToken(token: string): Promise<Subscription | null> {
+    return prisma.subscription.findUnique({
+      where: { unsubscribeToken: token },
+    });
+  },
+
+  deleteById(id: string): Promise<Subscription> {
+    return prisma.subscription.delete({
+      where: { id },
+    });
+  },
 };

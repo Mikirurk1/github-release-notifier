@@ -1,8 +1,11 @@
+import { randomBytes } from 'node:crypto';
 import { AxiosError } from 'axios';
 import { subscriptionsCreatedCounter } from '@/config/metrics';
 import { githubClient } from '@/clients/githubClient';
 import { subscriptionRepository } from '@/repositories/subscriptionRepository';
 import { logger } from '@/config/logger';
+import { toSubscriptionPublic, type SubscriptionPublic } from '@/mappers/subscriptionPublic';
+import { notifierService } from '@/services/notifierService';
 import { ExternalServiceError, NotFoundError, ValidationError } from '@/utils/errors';
 
 const repoRegex = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
@@ -18,6 +21,8 @@ const parseRepo = (repo: string): { owner: string; name: string } => {
   const [owner, name] = repo.split('/');
   return { owner, name };
 };
+
+const newUnsubscribeToken = (): string => randomBytes(24).toString('hex');
 
 const parseCreateSubscriptionInput = (
   input: unknown,
@@ -59,7 +64,7 @@ const parseCreateSubscriptionInput = (
 export const subscriptionService = {
   parseRepo,
 
-  async createSubscription(input: unknown, repoArg?: string) {
+  async createSubscription(input: unknown, repoArg?: string): Promise<SubscriptionPublic> {
     const payload = typeof input === 'string' ? { email: input, repo: repoArg } : input;
     const { email, repo } = parseCreateSubscriptionInput(payload);
     const { owner, name } = parseRepo(repo);
@@ -77,16 +82,41 @@ export const subscriptionService = {
     const exists = await subscriptionRepository.findByEmailAndRepo(email, repo);
     if (exists) {
       logger.debug({ email, repo, subscriptionId: exists.id }, 'Subscription already exists');
-      return exists;
+      const token = exists.unsubscribeToken || newUnsubscribeToken();
+      const upserted = exists.unsubscribeToken
+        ? exists
+        : await subscriptionRepository.updateUnsubscribeToken(exists.id, token);
+
+      try {
+        await notifierService.sendSubscriptionWelcome(email, repo, token);
+      } catch (err) {
+        logger.error(
+          { err, email, repo, subscriptionId: upserted.id },
+          'Failed to send subscription welcome email',
+        );
+        throw new ExternalServiceError('Subscription exists, but failed to send confirmation email.');
+      }
+
+      return toSubscriptionPublic(upserted);
     }
 
+    const unsubscribeToken = newUnsubscribeToken();
     const created = await subscriptionRepository.create({
       email,
       repo,
+      unsubscribeToken,
     });
 
     logger.info({ email, repo, subscriptionId: created.id }, 'Subscription created');
     subscriptionsCreatedCounter.inc();
-    return created;
+
+    try {
+      await notifierService.sendSubscriptionWelcome(email, repo, unsubscribeToken);
+    } catch (err) {
+      logger.error({ err, email, repo, subscriptionId: created.id }, 'Failed to send subscription welcome email');
+      throw new ExternalServiceError('Subscription created, but failed to send confirmation email.');
+    }
+
+    return toSubscriptionPublic(created);
   },
 };

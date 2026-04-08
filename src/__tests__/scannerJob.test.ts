@@ -15,6 +15,7 @@ describe('scannerJob', () => {
         email: 'john@example.com',
         repo: 'octocat/Hello-World',
         lastSeenTag: 'v1.0.0',
+        unsubscribeToken: 'deadbeef',
       },
     ]);
 
@@ -27,6 +28,12 @@ describe('scannerJob', () => {
     await scannerJob.runOnce();
 
     expect(notifierService.sendReleaseNotification).toHaveBeenCalledTimes(1);
+    expect(notifierService.sendReleaseNotification).toHaveBeenCalledWith(
+      'john@example.com',
+      'octocat/Hello-World',
+      expect.objectContaining({ tag_name: 'v1.1.0' }),
+      'deadbeef',
+    );
     expect(subscriptionRepository.updateLastSeenTag).toHaveBeenCalledWith('1', 'v1.1.0');
   });
 });

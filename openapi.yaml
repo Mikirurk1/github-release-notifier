@@ -5,6 +5,27 @@ info:
 servers:
   - url: /api
 paths:
+  /unsubscribe/{token}:
+    get:
+      summary: Remove subscription using the one-time link from email
+      description: Public HTML page; no API key.
+      tags:
+        - Subscriptions
+      servers:
+        - url: /
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: HTML — subscription removed
+        '400':
+          description: Invalid token format
+        '404':
+          description: Unknown or already used link
   /subscriptions:
     post:
       summary: Create a release subscription

@@ -13,6 +13,7 @@ const processSubscription = async (subscription: {
   email: string;
   repo: string;
   lastSeenTag: string | null;
+  unsubscribeToken: string | null;
 }): Promise<void> => {
   const { owner, name } = subscriptionService.parseRepo(subscription.repo);
   const latestRelease = await githubClient.getLatestRelease(owner, name);
@@ -22,7 +23,12 @@ const processSubscription = async (subscription: {
     return;
   }
 
-  await notifierService.sendReleaseNotification(subscription.email, subscription.repo, latestRelease);
+  await notifierService.sendReleaseNotification(
+    subscription.email,
+    subscription.repo,
+    latestRelease,
+    subscription.unsubscribeToken,
+  );
   await subscriptionRepository.updateLastSeenTag(subscription.id, latestRelease.tag_name);
   emailsSentCounter.inc();
   logger.info(
