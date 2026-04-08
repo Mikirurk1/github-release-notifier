@@ -33,11 +33,14 @@ describe('subscriptionService', () => {
     const result = await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
 
     expect(result).toEqual({
-      id: '1',
-      email: 'john@example.com',
-      repo: 'octocat/Hello-World',
-      lastSeenTag: null,
-      createdAt,
+      subscription: {
+        id: '1',
+        email: 'john@example.com',
+        repo: 'octocat/Hello-World',
+        lastSeenTag: null,
+        createdAt,
+      },
+      alreadySubscribed: false,
     });
     expect(subscriptionRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -53,7 +56,7 @@ describe('subscriptionService', () => {
     );
   });
 
-  it('sends welcome email when subscription already exists', async () => {
+  it('returns alreadySubscribed without email when subscription already exists', async () => {
     (githubClient.getRepository as jest.Mock).mockResolvedValue({ full_name: 'octocat/Hello-World' });
     (subscriptionRepository.findByEmailAndRepo as jest.Mock).mockResolvedValue({
       id: 'existing',
@@ -63,20 +66,24 @@ describe('subscriptionService', () => {
       unsubscribeToken: 'abc',
       createdAt,
     });
-    (notifierService.sendSubscriptionWelcome as jest.Mock).mockResolvedValue(undefined);
 
     const result = await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
 
-    expect(result.id).toBe('existing');
+    expect(result).toEqual({
+      subscription: {
+        id: 'existing',
+        email: 'john@example.com',
+        repo: 'octocat/Hello-World',
+        lastSeenTag: 'v1.0.0',
+        createdAt,
+      },
+      alreadySubscribed: true,
+    });
     expect(subscriptionRepository.create).not.toHaveBeenCalled();
-    expect(notifierService.sendSubscriptionWelcome).toHaveBeenCalledWith(
-      'john@example.com',
-      'octocat/Hello-World',
-      'abc',
-    );
+    expect(notifierService.sendSubscriptionWelcome).not.toHaveBeenCalled();
   });
 
-  it('generates unsubscribe token for legacy subscription without token', async () => {
+  it('backfills unsubscribe token for legacy subscription without token (no welcome email)', async () => {
     (githubClient.getRepository as jest.Mock).mockResolvedValue({ full_name: 'octocat/Hello-World' });
     (subscriptionRepository.findByEmailAndRepo as jest.Mock).mockResolvedValue({
       id: 'legacy',
@@ -97,19 +104,16 @@ describe('subscriptionService', () => {
           createdAt,
         }),
     );
-    (notifierService.sendSubscriptionWelcome as jest.Mock).mockResolvedValue(undefined);
 
-    await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
+    const result = await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
 
     expect(subscriptionRepository.updateUnsubscribeToken).toHaveBeenCalledWith(
       'legacy',
       expect.stringMatching(/^[a-f0-9]{48}$/),
     );
-    expect(notifierService.sendSubscriptionWelcome).toHaveBeenCalledWith(
-      'john@example.com',
-      'octocat/Hello-World',
-      expect.stringMatching(/^[a-f0-9]{48}$/),
-    );
+    expect(notifierService.sendSubscriptionWelcome).not.toHaveBeenCalled();
+    expect(result.alreadySubscribed).toBe(true);
+    expect(result.subscription.id).toBe('legacy');
   });
 
   it('throws when welcome email sending fails', async () => {

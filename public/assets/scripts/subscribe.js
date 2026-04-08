@@ -156,6 +156,14 @@ form.addEventListener('submit', async (event) => {
       return;
     }
 
+    if (payload.alreadySubscribed) {
+      showResult(
+        true,
+        `You are already subscribed. We will email ${payload.email} when ${payload.repo} publishes a new release.`,
+      );
+      return;
+    }
+
     showResult(
       true,
       `You are subscribed. We will email ${payload.email} for new releases on ${payload.repo}.`,

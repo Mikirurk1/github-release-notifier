@@ -15,3 +15,8 @@ export const toSubscriptionPublic = (sub: Subscription): SubscriptionPublic => (
   lastSeenTag: sub.lastSeenTag,
   createdAt: sub.createdAt,
 });
+
+export type CreateSubscriptionResult = {
+  subscription: SubscriptionPublic;
+  alreadySubscribed: boolean;
+};

@@ -48,12 +48,18 @@ paths:
                   type: string
                   example: owner/repo
       responses:
+        '200':
+          description: Already subscribed (same email and repo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
         '201':
           description: Subscription created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Subscription'
+                $ref: '#/components/schemas/SubscriptionResponse'
         '400':
           description: Invalid payload or repository format
           content:
@@ -84,6 +90,16 @@ components:
         createdAt:
           type: string
           format: date-time
+    SubscriptionResponse:
+      allOf:
+        - $ref: '#/components/schemas/Subscription'
+        - type: object
+          required:
+            - alreadySubscribed
+          properties:
+            alreadySubscribed:
+              type: boolean
+              description: true when this email/repo pair was already in the database
     ErrorResponse:
       type: object
       properties:
