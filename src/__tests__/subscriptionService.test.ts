@@ -1,9 +1,9 @@
-import { subscriptionService } from '../services/subscriptionService';
-import { githubClient } from '../clients/githubClient';
-import { subscriptionRepository } from '../repositories/subscriptionRepository';
+import { subscriptionService } from '@/services/subscriptionService';
+import { githubClient } from '@/clients/githubClient';
+import { subscriptionRepository } from '@/repositories/subscriptionRepository';
 
-jest.mock('../clients/githubClient');
-jest.mock('../repositories/subscriptionRepository');
+jest.mock('@/clients/githubClient');
+jest.mock('@/repositories/subscriptionRepository');
 
 describe('subscriptionService', () => {
   it('creates a subscription when repository exists', async () => {

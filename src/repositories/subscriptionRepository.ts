@@ -1,5 +1,5 @@
 import { Prisma, Subscription } from '@prisma/client';
-import { prisma } from '../config/prisma';
+import { prisma } from '@/config/prisma';
 
 export const subscriptionRepository = {
   create(data: Prisma.SubscriptionCreateInput): Promise<Subscription> {

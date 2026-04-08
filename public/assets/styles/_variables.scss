@@ -1,0 +1,17 @@
+// Breakpoints
+$sm: 576px;
+$md: 768px;
+$lg: 1024px;
+$xl: 1200px;
+$xxl: 1330px;
+
+// Optional: narrow layout (card / body width tweaks)
+$xs: 400px;
+
+// Primary colors (mirror landing palette; main theme still uses CSS vars in _tokens.scss)
+$primary: #0969da;
+$primary-hover: #0550ae;
+
+// Secondary / neutrals (for SCSS-only calculations or future use)
+$secondary: #475569;
+$secondary-muted: #64748b;

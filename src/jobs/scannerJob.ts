@@ -1,12 +1,12 @@
 import { AxiosError } from 'axios';
-import { githubClient } from '../clients/githubClient';
-import { emailsSentCounter } from '../config/metrics';
-import { logger } from '../config/logger';
-import { subscriptionRepository } from '../repositories/subscriptionRepository';
-import { notifierService } from '../services/notifierService';
-import { releaseService } from '../services/releaseService';
-import { subscriptionService } from '../services/subscriptionService';
-import { ValidationError } from '../utils/errors';
+import { githubClient } from '@/clients/githubClient';
+import { emailsSentCounter } from '@/config/metrics';
+import { logger } from '@/config/logger';
+import { subscriptionRepository } from '@/repositories/subscriptionRepository';
+import { notifierService } from '@/services/notifierService';
+import { releaseService } from '@/services/releaseService';
+import { subscriptionService } from '@/services/subscriptionService';
+import { ValidationError } from '@/utils/errors';
 
 const processSubscription = async (subscription: {
   id: string;

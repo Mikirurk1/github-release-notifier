@@ -1,4 +1,4 @@
-import { GithubReleaseResponse } from '../clients/githubClient';
+import { GithubReleaseResponse } from '@/clients/githubClient';
 
 export const releaseService = {
   isNewRelease(lastSeenTag: string | null, latestRelease: GithubReleaseResponse | null): boolean {

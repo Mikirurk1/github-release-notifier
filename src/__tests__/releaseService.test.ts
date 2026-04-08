@@ -1,4 +1,4 @@
-import { releaseService } from '../services/releaseService';
+import { releaseService } from '@/services/releaseService';
 
 describe('releaseService', () => {
   it('returns true when no previous tag exists', () => {

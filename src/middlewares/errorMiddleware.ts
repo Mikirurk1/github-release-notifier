@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '../config/logger';
-import { AppError } from '../utils/errors';
+import { logger } from '@/config/logger';
+import { AppError } from '@/utils/errors';
 
 export const errorMiddleware = (err: Error, _req: Request, res: Response, _next: NextFunction): void => {
   if (err instanceof AppError) {

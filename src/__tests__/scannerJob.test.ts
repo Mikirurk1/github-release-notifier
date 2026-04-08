@@ -1,11 +1,11 @@
-import { scannerJob } from '../jobs/scannerJob';
-import { githubClient } from '../clients/githubClient';
-import { subscriptionRepository } from '../repositories/subscriptionRepository';
-import { notifierService } from '../services/notifierService';
+import { scannerJob } from '@/jobs/scannerJob';
+import { githubClient } from '@/clients/githubClient';
+import { subscriptionRepository } from '@/repositories/subscriptionRepository';
+import { notifierService } from '@/services/notifierService';
 
-jest.mock('../clients/githubClient');
-jest.mock('../repositories/subscriptionRepository');
-jest.mock('../services/notifierService');
+jest.mock('@/clients/githubClient');
+jest.mock('@/repositories/subscriptionRepository');
+jest.mock('@/services/notifierService');
 
 describe('scannerJob', () => {
   it('sends email and updates tag on new release', async () => {

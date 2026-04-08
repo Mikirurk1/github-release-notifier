@@ -1,5 +1,5 @@
-import { EmailPayload, emailClient } from '../clients/emailClient';
-import { GithubReleaseResponse } from '../clients/githubClient';
+import { EmailPayload, emailClient } from '@/clients/emailClient';
+import { GithubReleaseResponse } from '@/clients/githubClient';
 
 export const notifierService = {
   buildReleaseEmail(to: string, repo: string, release: GithubReleaseResponse): EmailPayload {

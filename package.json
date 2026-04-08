@@ -5,17 +5,18 @@
   "main": "dist/server.js",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc",
+    "build:public-css": "sass public/assets/styles/main.scss public/assets/styles/main.min.css --style=compressed --no-source-map",
+    "build": "npm run build:public-css && tsc && tsc-alias",
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate:deploy": "prisma migrate deploy"
+    "prisma:generate": "prisma generate --config=./prisma.config.mjs",
+    "prisma:migrate:deploy": "prisma migrate deploy --config=./prisma.config.mjs"
   },
   "keywords": [
     "express",
@@ -56,9 +57,12 @@
     "eslint-config-prettier": "^10.1.8",
     "jest": "^30.2.0",
     "prettier": "^3.8.1",
+    "sass": "^1.93.3",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.58.1"
   }

@@ -1,0 +1,21 @@
+@use 'variables' as *;
+
+@mixin w($window-size) {
+  @media screen and (max-width: ($window-size - 1px)) {
+    @content;
+  }
+}
+
+@mixin min-w($window-size) {
+  @media screen and (min-width: ($window-size)) {
+    @content;
+  }
+}
+
+@mixin min-hover($window-size) {
+  @include min-w($window-size) {
+    &:hover {
+      @content;
+    }
+  }
+}

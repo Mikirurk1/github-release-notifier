@@ -25,6 +25,15 @@ After a subscription is created, the service periodically checks releases via th
 - Redis (optional)
 - Docker + Docker Compose
 
+## Static frontend
+
+- Page: `public/index.html`
+- SCSS source: `public/assets/styles/` — entry `main.scss`, partials `_*.scss` (including `_variables.scss`, `_mixins.scss`)
+- Compiled stylesheet served by Express: `public/assets/styles/main.min.css`
+- Rebuild CSS: `npm run build:public-css` (also runs automatically as part of `npm run build`)
+- Client script: `public/assets/scripts/subscribe.js`
+- Images: `public/assets/images/`
+
 ## Quick Start (Local)
 
 1) Create `.env`:
@@ -60,7 +69,14 @@ npm run dev
 ## Run with Docker
 
 ```bash
-docker-compose up --build
+docker compose up --build
+```
+
+If the API container exits with **"The datasource.url property is required"**, the Docker image is likely **stale** (cached from an older `Dockerfile` without `prisma.config.mjs` inside the image). Rebuild the API image without cache:
+
+```bash
+docker compose build --no-cache api
+docker compose up
 ```
 
 After startup:
@@ -115,6 +131,8 @@ Migrations run through `prisma migrate deploy`:
 
 - on service startup (`src/server.ts`)
 - in Docker startup command (`Dockerfile`)
+
+The database URL is set in `prisma.config.mjs` (Prisma 7). NPM scripts pass `--config=./prisma.config.mjs`. Run CLI commands from the **repository root**, and set `DATABASE_URL` in `.env` or in the process environment (Docker Compose sets it for the `api` service).
 
 ## Tests and Code Quality
 

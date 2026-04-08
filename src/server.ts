@@ -1,12 +1,12 @@
 import { execSync } from 'node:child_process';
-import { app } from './app';
-import { env, validateEnv } from './config/env';
-import { logger } from './config/logger';
-import { prisma } from './config/prisma';
-import { scannerJob } from './jobs/scannerJob';
+import { app } from '@/app';
+import { env, validateEnv } from '@/config/env';
+import { logger } from '@/config/logger';
+import { prisma } from '@/config/prisma';
+import { scannerJob } from '@/jobs/scannerJob';
 
 const runMigrations = (): void => {
-  execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  execSync('npx prisma migrate deploy --config=./prisma.config.mjs', { stdio: 'inherit' });
 };
 
 const bootstrap = async (): Promise<void> => {

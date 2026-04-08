@@ -1,9 +1,9 @@
 import { AxiosError } from 'axios';
-import { subscriptionsCreatedCounter } from '../config/metrics';
-import { githubClient } from '../clients/githubClient';
-import { subscriptionRepository } from '../repositories/subscriptionRepository';
-import { logger } from '../config/logger';
-import { ExternalServiceError, NotFoundError, ValidationError } from '../utils/errors';
+import { subscriptionsCreatedCounter } from '@/config/metrics';
+import { githubClient } from '@/clients/githubClient';
+import { subscriptionRepository } from '@/repositories/subscriptionRepository';
+import { logger } from '@/config/logger';
+import { ExternalServiceError, NotFoundError, ValidationError } from '@/utils/errors';
 
 const repoRegex = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

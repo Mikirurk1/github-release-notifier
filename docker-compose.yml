@@ -1,6 +1,6 @@
-version: '3.9'
 services:
   db:
+    container_name: github-release-notifier-db
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
@@ -12,11 +12,13 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   redis:
+    container_name: github-release-notifier-redis
     image: redis:7-alpine
     ports:
       - '6379:6379'
 
   api:
+    container_name: github-release-notifier-api
     build: .
     depends_on:
       - db

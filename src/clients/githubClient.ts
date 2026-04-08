@@ -1,8 +1,8 @@
 import axios, { AxiosError } from 'axios';
-import { cacheClient } from './cacheClient';
-import { env } from '../config/env';
-import { githubApiFailuresCounter } from '../config/metrics';
-import { sleep } from '../utils/asyncUtils';
+import { cacheClient } from '@/clients/cacheClient';
+import { env } from '@/config/env';
+import { githubApiFailuresCounter } from '@/config/metrics';
+import { sleep } from '@/utils/asyncUtils';
 
 export interface GithubRepoResponse {
   full_name: string;
