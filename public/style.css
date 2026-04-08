@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 0 16px;
+  line-height: 1.4;
+}
+
+h1 {
+  margin-bottom: 8px;
+}
+
+form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+input,
+button {
+  font: inherit;
+  padding: 10px 12px;
+}
+
+button {
+  cursor: pointer;
+}
+
+#result {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+}
+
+.ok {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.12);
+}

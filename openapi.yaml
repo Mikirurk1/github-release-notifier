@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: GitHub Release Notifier API
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /subscriptions:
+    post:
+      summary: Create a release subscription
+      tags:
+        - Subscriptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - repo
+              properties:
+                email:
+                  type: string
+                  format: email
+                repo:
+                  type: string
+                  example: owner/repo
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid payload or repository format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Repository not found on GitHub
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        repo:
+          type: string
+        lastSeenTag:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string

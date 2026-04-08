@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Subscription {
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String
+  repo        String
+  lastSeenTag String?
+  createdAt   DateTime @default(now())
+
+  @@unique([email, repo])
+}

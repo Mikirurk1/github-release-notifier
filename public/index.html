@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Release Notifier</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h1>Subscribe to GitHub Releases</h1>
+    <p>Enter your email and repository in <code>owner/repo</code> format.</p>
+
+    <form id="subscribe-form">
+      <label>
+        Email
+        <input id="email" type="email" placeholder="john@example.com" required />
+      </label>
+
+      <label>
+        Repository
+        <input id="repo" type="text" placeholder="golang/go" required />
+      </label>
+
+      <label>
+        API Key (optional)
+        <input id="apiKey" type="text" placeholder="x-api-key header value" />
+      </label>
+
+      <button type="submit">Subscribe</button>
+    </form>
+
+    <div id="result" hidden></div>
+    <script src="/scripts.js"></script>
+  </body>
+</html>

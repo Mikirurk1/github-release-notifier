@@ -1,0 +1,43 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notifier
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+  api:
+    build: .
+    depends_on:
+      - db
+      - redis
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/notifier?schema=public
+      GITHUB_API_BASE_URL: https://api.github.com
+      SCANNER_INTERVAL_MS: 300000
+      SMTP_HOST: sandbox.smtp.mailtrap.io
+      SMTP_PORT: 2525
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: notifier@example.com
+      ENABLE_REDIS_CACHE: 'true'
+      REDIS_URL: redis://redis:6379
+      GITHUB_CACHE_TTL_SEC: 600
+      API_KEY: ${API_KEY}
+    ports:
+      - '3000:3000'
+
+volumes:
+  pgdata:
