@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build:public-css": "sass public/assets/styles/main.scss public/assets/styles/main.min.css --style=compressed --no-source-map",
-    "build": "npm run build:public-css && tsc && tsc-alias",
+    "build": "npm run prisma:generate && npm run build:public-css && tsc && tsc-alias",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "test": "jest --runInBand",
