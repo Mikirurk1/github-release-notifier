@@ -8,8 +8,9 @@ export const apiKeyMiddleware = (req: Request, res: Response, next: NextFunction
     return;
   }
 
-  const apiKey = req.header('x-api-key');
-  if (apiKey !== env.apiKey) {
+  const headerValue = req.header('x-api-key');
+  const apiKey = headerValue?.trim() ?? '';
+  if (!apiKey || apiKey !== env.apiKey) {
     next(new UnauthorizedError());
     return;
   }

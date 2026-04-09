@@ -23,6 +23,8 @@
       --input-bg: #fff;
       --input-border: rgba(15, 23, 42, 0.12);
       --code-bg: rgba(15, 23, 42, 0.06);
+      --info-bg: color-mix(in srgb, var(--accent) 10%, transparent);
+      --info-border: color-mix(in srgb, var(--accent) 28%, var(--card-border));
     }
   }
 
@@ -40,6 +42,8 @@
       --accent-hover: #79b8ff;
       --accent-muted: color-mix(in srgb, var(--accent) 22%, transparent);
       --shadow: var(--shadow-dark);
+      --info-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+      --info-border: color-mix(in srgb, var(--accent) 32%, var(--card-border));
     }
   }
 }

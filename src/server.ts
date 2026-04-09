@@ -4,6 +4,7 @@ import { env, validateEnv } from '@/config/env';
 import { logger } from '@/config/logger';
 import { prisma } from '@/config/prisma';
 import { scannerJob } from '@/jobs/scannerJob';
+import { startGrpcServer } from '@/grpc/subscriptionGrpc';
 
 const runMigrations = (): void => {
   execSync('npx prisma migrate deploy --config=./prisma.config.mjs', { stdio: 'inherit' });
@@ -20,6 +21,12 @@ const bootstrap = async (): Promise<void> => {
 
   scannerJob.start(env.scannerIntervalMs);
   logger.info({ scannerIntervalMs: env.scannerIntervalMs }, 'Scanner job started');
+
+  if (env.grpcPort > 0) {
+    await startGrpcServer(env.grpcPort);
+  } else {
+    logger.info('gRPC disabled (GRPC_PORT=0)');
+  }
 };
 
 bootstrap().catch((error) => {

@@ -13,10 +13,12 @@ COPY prisma.config.mjs ./
 RUN npx prisma generate --config=./prisma.config.mjs
 
 COPY tsconfig.json jest.config.js openapi.yaml ./
+COPY proto ./proto
 COPY public ./public
 COPY src ./src
 RUN npm run build
 
 EXPOSE 3000
+EXPOSE 50051
 
 CMD ["sh", "-c", "npm run prisma:migrate:deploy && npm run start"]

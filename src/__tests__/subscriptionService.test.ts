@@ -30,7 +30,10 @@ describe('subscriptionService', () => {
     );
     (notifierService.sendSubscriptionWelcome as jest.Mock).mockResolvedValue(undefined);
 
-    const result = await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
+    const result = await subscriptionService.createSubscription({
+      email: 'john@example.com',
+      repo: 'octocat/Hello-World',
+    });
 
     expect(result).toEqual({
       subscription: {
@@ -67,7 +70,10 @@ describe('subscriptionService', () => {
       createdAt,
     });
 
-    const result = await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
+    const result = await subscriptionService.createSubscription({
+      email: 'john@example.com',
+      repo: 'octocat/Hello-World',
+    });
 
     expect(result).toEqual({
       subscription: {
@@ -105,7 +111,10 @@ describe('subscriptionService', () => {
         }),
     );
 
-    const result = await subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World');
+    const result = await subscriptionService.createSubscription({
+      email: 'john@example.com',
+      repo: 'octocat/Hello-World',
+    });
 
     expect(subscriptionRepository.updateUnsubscribeToken).toHaveBeenCalledWith(
       'legacy',
@@ -129,14 +138,14 @@ describe('subscriptionService', () => {
     });
     (notifierService.sendSubscriptionWelcome as jest.Mock).mockRejectedValue(new Error('smtp failed'));
 
-    await expect(subscriptionService.createSubscription('john@example.com', 'octocat/Hello-World')).rejects.toThrow(
-      'Subscription created, but failed to send confirmation email.',
-    );
+    await expect(
+      subscriptionService.createSubscription({ email: 'john@example.com', repo: 'octocat/Hello-World' }),
+    ).rejects.toThrow('Subscription created, but failed to send confirmation email.');
   });
 
   it('throws for invalid repo format', async () => {
-    await expect(subscriptionService.createSubscription('john@example.com', 'bad-format')).rejects.toThrow(
-      'Invalid repository format',
-    );
+    await expect(
+      subscriptionService.createSubscription({ email: 'john@example.com', repo: 'bad-format' }),
+    ).rejects.toThrow('Invalid repository format');
   });
 });

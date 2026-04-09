@@ -1,93 +1,41 @@
 import { randomBytes } from 'node:crypto';
-import { AxiosError } from 'axios';
+import axios from 'axios';
 import { subscriptionsCreatedCounter } from '@/config/metrics';
 import { githubClient } from '@/clients/githubClient';
 import { subscriptionRepository } from '@/repositories/subscriptionRepository';
 import { logger } from '@/config/logger';
-import { toSubscriptionPublic, type CreateSubscriptionResult } from '@/mappers/subscriptionPublic';
+import { toPublicSubscription, type CreateSubscriptionResult } from '@/mappers/subscriptionPublic';
 import { notifierService } from '@/services/notifierService';
-import { ExternalServiceError, NotFoundError, ValidationError } from '@/utils/errors';
+import { ExternalServiceError, NotFoundError } from '@/utils/errors';
+import { parseRepoSlug, readCreateSubscriptionBody } from '@/validation/subscription';
 
-const repoRegex = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_EMAIL_LENGTH = 320;
-const MAX_REPO_LENGTH = 200;
-
-const parseRepo = (repo: string): { owner: string; name: string } => {
-  if (!repoRegex.test(repo)) {
-    throw new ValidationError('Invalid repository format. Expected "owner/repo".');
-  }
-
-  const [owner, name] = repo.split('/');
-  return { owner, name };
-};
-
-const newUnsubscribeToken = (): string => randomBytes(24).toString('hex');
-
-const parseCreateSubscriptionInput = (
-  input: unknown,
-): {
-  email: string;
-  repo: string;
-} => {
-  if (!input || typeof input !== 'object') {
-    throw new ValidationError('Request body must be a JSON object.');
-  }
-
-  const candidate = input as { email?: unknown; repo?: unknown };
-  if (typeof candidate.email !== 'string' || typeof candidate.repo !== 'string') {
-    throw new ValidationError('email and repo are required.');
-  }
-
-  const email = candidate.email.toLowerCase().trim();
-  const repo = candidate.repo.trim();
-
-  if (!email || !repo) {
-    throw new ValidationError('email and repo are required.');
-  }
-
-  if (email.length > MAX_EMAIL_LENGTH) {
-    throw new ValidationError('Email is too long.');
-  }
-
-  if (repo.length > MAX_REPO_LENGTH) {
-    throw new ValidationError('Repository name is too long.');
-  }
-
-  if (!emailRegex.test(email)) {
-    throw new ValidationError('Invalid email format.');
-  }
-
-  return { email, repo };
-};
+function newUnsubscribeToken(): string {
+  return randomBytes(24).toString('hex');
+}
 
 export const subscriptionService = {
-  parseRepo,
-
-  async createSubscription(input: unknown, repoArg?: string): Promise<CreateSubscriptionResult> {
-    const payload = typeof input === 'string' ? { email: input, repo: repoArg } : input;
-    const { email, repo } = parseCreateSubscriptionInput(payload);
-    const { owner, name } = parseRepo(repo);
+  async createSubscription(body: unknown): Promise<CreateSubscriptionResult> {
+    const { email, repo } = readCreateSubscriptionBody(body);
+    const { owner, name } = parseRepoSlug(repo);
 
     try {
       await githubClient.getRepository(owner, name);
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 404) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         throw new NotFoundError('Repository not found on GitHub.');
       }
+      logger.warn({ err: error, owner, name }, 'GitHub repository validation failed');
       throw new ExternalServiceError('Failed to validate repository with GitHub API.');
     }
 
-    const exists = await subscriptionRepository.findByEmailAndRepo(email, repo);
-    if (exists) {
-      logger.debug({ email, repo, subscriptionId: exists.id }, 'Subscription already exists');
-      let current = exists;
-      if (!exists.unsubscribeToken) {
-        const token = newUnsubscribeToken();
-        current = await subscriptionRepository.updateUnsubscribeToken(exists.id, token);
+    const existing = await subscriptionRepository.findByEmailAndRepo(email, repo);
+    if (existing) {
+      logger.debug({ email, repo, subscriptionId: existing.id }, 'Subscription already exists');
+      let row = existing;
+      if (!existing.unsubscribeToken) {
+        row = await subscriptionRepository.updateUnsubscribeToken(existing.id, newUnsubscribeToken());
       }
-      return { subscription: toSubscriptionPublic(current), alreadySubscribed: true };
+      return { subscription: toPublicSubscription(row), alreadySubscribed: true };
     }
 
     const unsubscribeToken = newUnsubscribeToken();
@@ -103,10 +51,10 @@ export const subscriptionService = {
     try {
       await notifierService.sendSubscriptionWelcome(email, repo, unsubscribeToken);
     } catch (err) {
-      logger.error({ err, email, repo, subscriptionId: created.id }, 'Failed to send subscription welcome email');
+      logger.error({ err, email, repo, subscriptionId: created.id }, 'Welcome email failed after create');
       throw new ExternalServiceError('Subscription created, but failed to send confirmation email.');
     }
 
-    return { subscription: toSubscriptionPublic(created), alreadySubscribed: false };
+    return { subscription: toPublicSubscription(created), alreadySubscribed: false };
   },
 };

@@ -18,6 +18,7 @@ const parseNumber = (value: string | undefined, fallback: number): number => {
 
 export const env = {
   port: parseNumber(process.env.PORT, 3000),
+  grpcPort: parseNumber(process.env.GRPC_PORT, 50051),
   nodeEnv: process.env.NODE_ENV || 'development',
   databaseUrl: process.env.DATABASE_URL || '',
   githubToken: process.env.GITHUB_TOKEN,
@@ -29,7 +30,6 @@ export const env = {
   smtpUser: process.env.SMTP_USER || '',
   smtpPass: process.env.SMTP_PASS || '',
   smtpFrom: process.env.SMTP_FROM || 'noreply@example.com',
-  /** Public base URL for email links (unsubscribe). Falls back to http://localhost:{PORT}. */
   publicAppUrl:
     (process.env.PUBLIC_APP_URL && process.env.PUBLIC_APP_URL.replace(/\/$/, '')) ||
     `http://localhost:${parseNumber(process.env.PORT, 3000)}`,
@@ -50,6 +50,15 @@ export const validateEnv = (): void => {
 
   if (!Number.isInteger(env.port) || env.port <= 0 || env.port > 65535) {
     throw new Error('PORT must be a valid TCP port between 1 and 65535');
+  }
+
+  if (env.grpcPort !== 0) {
+    if (!Number.isInteger(env.grpcPort) || env.grpcPort < 1 || env.grpcPort > 65535) {
+      throw new Error('GRPC_PORT must be 0 (disabled) or a TCP port between 1 and 65535');
+    }
+    if (env.grpcPort === env.port) {
+      throw new Error('GRPC_PORT and PORT must differ');
+    }
   }
 
   if (!Number.isInteger(env.smtpPort) || env.smtpPort <= 0 || env.smtpPort > 65535) {

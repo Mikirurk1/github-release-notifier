@@ -8,13 +8,15 @@ export type SubscriptionPublic = {
   createdAt: Date;
 };
 
-export const toSubscriptionPublic = (sub: Subscription): SubscriptionPublic => ({
-  id: sub.id,
-  email: sub.email,
-  repo: sub.repo,
-  lastSeenTag: sub.lastSeenTag,
-  createdAt: sub.createdAt,
-});
+export function toPublicSubscription(row: Subscription): SubscriptionPublic {
+  return {
+    id: row.id,
+    email: row.email,
+    repo: row.repo,
+    lastSeenTag: row.lastSeenTag,
+    createdAt: row.createdAt,
+  };
+}
 
 export type CreateSubscriptionResult = {
   subscription: SubscriptionPublic;

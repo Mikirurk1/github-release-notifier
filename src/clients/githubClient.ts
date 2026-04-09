@@ -23,12 +23,12 @@ const githubApi = axios.create({
   timeout: 10000,
 });
 
-const withBackoff = async <T>(fn: () => Promise<T>): Promise<T> => {
+const withBackoff = async <T>(request: () => Promise<T>): Promise<T> => {
   const delays = [500, 1000, 2000];
 
   for (let attempt = 0; attempt <= delays.length; attempt += 1) {
     try {
-      return await fn();
+      return await request();
     } catch (error) {
       const axiosError = error as AxiosError;
       const status = axiosError.response?.status;
@@ -48,13 +48,21 @@ const withBackoff = async <T>(fn: () => Promise<T>): Promise<T> => {
 
 const cacheGet = async <T>(key: string): Promise<T | null> => {
   if (!cacheClient) return null;
-  const raw = await cacheClient.get(key);
-  return raw ? (JSON.parse(raw) as T) : null;
+  try {
+    const raw = await cacheClient.get(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
 };
 
 const cacheSet = async (key: string, value: unknown): Promise<void> => {
   if (!cacheClient) return;
-  await cacheClient.setex(key, env.githubCacheTtlSec, JSON.stringify(value));
+  try {
+    await cacheClient.setex(key, env.githubCacheTtlSec, JSON.stringify(value));
+  } catch {
+    return;
+  }
 };
 
 export const githubClient = {

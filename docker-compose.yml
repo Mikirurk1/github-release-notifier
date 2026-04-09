@@ -26,6 +26,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      GRPC_PORT: 50051
       DATABASE_URL: postgresql://postgres:postgres@db:5432/notifier?schema=public
       GITHUB_API_BASE_URL: https://api.github.com
       SCANNER_INTERVAL_MS: 300000
@@ -40,6 +41,7 @@ services:
       API_KEY: ${API_KEY}
     ports:
       - '3000:3000'
+      - '50051:50051'
 
 volumes:
   pgdata:

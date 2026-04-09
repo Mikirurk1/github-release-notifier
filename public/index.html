@@ -7,6 +7,9 @@
       name="description"
       content="Subscribe to email notifications when a GitHub repository publishes a new release."
     />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef2f7" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1117" />
     <title>Release alerts · GitHub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -76,25 +79,37 @@
 
         <details class="advanced">
           <summary class="advanced__summary">Optional: API key</summary>
-          <p class="advanced__help">
+          <p id="advanced-api-help" class="advanced__help">
             If the server has <code>API_KEY</code> set, paste the same value here — it is sent as
-            the <code>x-api-key</code> header.
+            the <code>x-api-key</code> header. The value is not stored; it is only used for this
+            browser sessions requests.
           </p>
-          <label class="field__label" for="apiKey">API key</label>
-          <input
-            id="apiKey"
-            class="field__input field__input--mono"
-            type="password"
-            name="apiKey"
-            placeholder="Secret token"
-            autocomplete="off"
-          />
+          <div class="field">
+            <label class="field__label" for="apiKey">API key</label>
+            <input
+              id="apiKey"
+              class="field__input field__input--mono"
+              type="password"
+              name="apiKey"
+              placeholder="Secret token"
+              autocomplete="off"
+              aria-describedby="advanced-api-help"
+            />
+          </div>
         </details>
 
-        <button type="submit" class="submit" id="submit-btn">Subscribe test</button>
+        <button type="submit" class="submit" id="submit-btn" aria-busy="false">Subscribe</button>
       </form>
 
-      <div id="result" class="result" hidden role="status" aria-live="polite"></div>
+      <div
+        id="result"
+        class="result"
+        hidden
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        tabindex="-1"
+      ></div>
     </main>
 
     <footer class="footer">

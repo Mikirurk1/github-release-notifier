@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package notifier;
+
+// gRPC complement to REST POST /api/subscriptions (OpenAPI contract unchanged).
+service SubscriptionService {
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
+}
+
+message CreateSubscriptionRequest {
+  string email = 1;
+  string repo = 2;
+}
+
+message CreateSubscriptionResponse {
+  string id = 1;
+  string email = 2;
+  string repo = 3;
+  string last_seen_tag = 4;
+  string created_at = 5;
+  bool already_subscribed = 6;
+}

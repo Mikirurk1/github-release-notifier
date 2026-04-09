@@ -7,7 +7,7 @@ export const errorMiddleware = (err: Error, _req: Request, res: Response, _next:
     res.status(err.statusCode).json({
       error: err.code,
       message: err.message,
-      details: err.details,
+      ...(err.details !== undefined ? { details: err.details } : {}),
     });
     return;
   }
